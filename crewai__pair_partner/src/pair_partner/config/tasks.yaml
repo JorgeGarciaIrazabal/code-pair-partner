@@ -1,16 +1,24 @@
-write_interesting_stories_task:
-  description: >
-    Write an engaging zoo update that captures the week's most fascinating stories
-    and memorable moments. Share stand-out animal moments that show off their unique
-    personalities. Include visitor interactions, keeper stories, and facility updates.
-    Focus on interesting details that would surprise and delight readers. Keep the tone
-    friendly and conversational. Aim for 250 words.
-  expected_output: 5 engaging stories/updates that summarize the day.
-  agent: zookeeper
+read_content_from_file:
+    description: >
+        Read the content from the file {file_with_feature}
+    expected_output: The content of the file
+    agent: local_file_manager
 
-publish_blog_posts_task:
-  description: >
-    Publish the stories as one blog post to the zoo's WordPress site. Check recent
-    posts to avoid content duplication. Set status to "published" directly.
-  expected_output: A live blog post series showcasing the zoo's animals.
-  agent: social_media_manager
+create_tests_for_features:
+    description: >
+        write the tests for the module/function/features in the path {file_with_feature}.
+    expected_output: The tests, and only the tests in pytest for the new feature
+    agent: tester
+
+write_content_in_file:
+    description: >
+        Write the content in {write_tests_in_path}
+    expected_output: A file with the content written in it
+    agent: local_file_manager
+
+calculate:
+    description: >
+        use the tools provided to calculate the factorial of the number 10 then divide it by 10 and 
+        then add 10 to the result.
+    expected_output: The result of the expression
+    agent: math_expert

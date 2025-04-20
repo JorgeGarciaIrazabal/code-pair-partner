@@ -1,9 +1,18 @@
-from crewai import Agent, Crew, Process, Task
-from crewai.project import CrewBase, agent, crew, task
+import os
+import sys
 
-# If you want to run a snippet of code before or after the crew starts,
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+from crewai import Agent, Crew, Process, Task, LLM
+from crewai.project import CrewBase, agent, crew, task
+from crewai_tools import FileReadTool, FileWriterTool, MCPServerAdapter
+from mcp import StdioServerParameters
+
+serverparams = StdioServerParameters(
+    command=sys.executable,
+    args=["/home/jorge/code/code-pair-partner/mcp_server.py"],
+    env={"UV_PYTHON": "3.12", **os.environ},
+)
+
+mcp_server_adapter = MCPServerAdapter(serverparams)
 
 @CrewBase
 class PairPartner():
@@ -18,33 +27,66 @@ class PairPartner():
     # If you would like to add tools to your agents, you can learn more about it here:
     # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
-    def researcher(self) -> Agent:
+    def tester(self) -> Agent:
         return Agent(
-            config=self.agents_config['researcher'],
-            verbose=True
+            config=self.agents_config['tester'],
+            verbose=True,
+            llm=LLM(
+                model="ollama/cogito:14b",
+                api_base="http://localhost:11434",
+                stream=True,
+            )
         )
 
     @agent
-    def reporting_analyst(self) -> Agent:
+    def local_file_manager(self) -> Agent:
         return Agent(
-            config=self.agents_config['reporting_analyst'],
-            verbose=True
+            config=self.agents_config['local_file_manager'],
+            verbose=True,
+            tools=[FileWriterTool(), FileReadTool()],
+            llm=LLM(
+                model="ollama/cogito:14b",
+                api_base="http://localhost:11434",
+                stream=True,
+            )
         )
 
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
-    @task
-    def research_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['research_task'],
+    @agent
+    def math_expert(self) -> Agent:
+        return Agent(
+            config=self.agents_config['math_expert'],
+            verbose=True,
+            tools=mcp_server_adapter.tools,
+            llm=LLM(
+                model="ollama/cogito:14b",
+                api_base="http://localhost:11434",
+                stream=True,
+            )
         )
 
+    # @task
+    # def read_content_from_file(self) -> Task:
+    #     return Task(
+    #         config=self.tasks_config['read_content_from_file'],
+    #     )
+    #
+    # @task
+    # def create_tests_for_features(self) -> Task:
+    #     return Task(
+    #         config=self.tasks_config['create_tests_for_features'],
+    #     )
+    #
+    #
+    # @task
+    # def write_content_in_file(self) -> Task:
+    #     return Task(
+    #         config=self.tasks_config['write_content_in_file'],
+    #     )
+
     @task
-    def reporting_task(self) -> Task:
+    def calculate(self) -> Task:
         return Task(
-            config=self.tasks_config['reporting_task'],
-            output_file='report.md'
+            config=self.tasks_config['calculate'],
         )
 
     @crew

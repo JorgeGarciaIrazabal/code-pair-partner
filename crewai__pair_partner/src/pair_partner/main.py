@@ -4,63 +4,28 @@ import warnings
 
 from datetime import datetime
 
-from pair_partner.crew import PairPartner
+from pair_partner.crew import PairPartner, mcp_server_adapter
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
 
 def run():
     """
     Run the crew.
     """
     inputs = {
-        'topic': 'AI LLMs',
-        'current_year': str(datetime.now().year)
+        'file_with_feature': '/home/jorge/code/code-pair-partner/new_feature.py',
+        'write_tests_in_path': '/home/jorge/code/code-pair-partner/test_new_feature.py',
     }
     
     try:
         PairPartner().crew().kickoff(inputs=inputs)
     except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+        raise Exception(f"An error occurred while running the crew: {e}") from e
+    finally:
+        mcp_server_adapter.stop()
 
 
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        "topic": "AI LLMs"
-    }
-    try:
-        PairPartner().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
 
-    except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
-
-def replay():
-    """
-    Replay the crew execution from a specific task.
-    """
-    try:
-        PairPartner().crew().replay(task_id=sys.argv[1])
-
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
-
-def test():
-    """
-    Test the crew execution and returns the results.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        "current_year": str(datetime.now().year)
-    }
-    try:
-        PairPartner().crew().test(n_iterations=int(sys.argv[1]), openai_model_name=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while testing the crew: {e}")
+if __name__ == '__main__':
+    run()

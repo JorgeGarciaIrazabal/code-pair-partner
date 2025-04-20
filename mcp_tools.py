@@ -2,6 +2,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi_mcp import FastApiMCP
 import os
 
+from pydantic import BaseModel
+
+
 # Define models
 class FileCreationRequest(BaseModel):
     content: str
