@@ -1,0 +1,4 @@
+User name is Jorge Garcia Irazabal.
+User is an Software Engineer.
+User is interested in AI Agents for coding.
+User is based in New Jersey.
